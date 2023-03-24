@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from '../src/prisma/prisma.service';
-import { CreateUserDto } from '../src/user/dto/user.create.dto';
-import { EditUserDto } from '../src/user/dto/user.edit.dto';
+import { CreateUserDto } from '../src/user/dto/user-create.dto';
+import { EditUserDto } from '../src/user/dto/user-edit.dto';
 import { UserService } from '../src/user/user.service';
 // Mock para o PrismaService
 const prismaServiceMock = {
