@@ -1,6 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import * as jwt from 'jsonwebtoken';
 import { UserService } from '../user/user.service';
 import { LoginDto } from './login.dto';
 
@@ -45,5 +46,12 @@ export class AuthService {
         email: user.email,
       },
     };
+  }
+
+  async getLoggedUser(token: string) {
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const email = decodedToken['username'];
+
+    return await this.userService.findByEmail(email);
   }
 }

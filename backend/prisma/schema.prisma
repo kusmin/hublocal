@@ -28,7 +28,7 @@ model Empresa {
   usuarioId Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  usuario   User     @relation(fields: [usuarioId], references: [id]) // Relacionamento Many To One com Usuários
+  usuario   User     @relation(fields: [usuarioId], references: [id], onDelete: Cascade) // Relacionamento Many To One com Usuários
   locais    Local[] // Relacionamento One To Many com Locais
 }
 
@@ -44,5 +44,5 @@ model Local {
   empresaId Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  empresa   Empresa  @relation(fields: [empresaId], references: [id]) // Relacionamento Many To One com Empresas
+  empresa   Empresa  @relation(fields: [empresaId], references: [id], onDelete: Cascade) // Relacionamento Many To One com Empresas
 }
