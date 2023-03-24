@@ -11,16 +11,22 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import {
+  ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
   ApiOperation,
   ApiResponse,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+
 import { Validate } from 'class-validator';
 import { Request } from 'express';
 import { AuthService } from '../auth/auth.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { CreateEmpresaDto, UpdateEmpresaDto } from './empresa.dto';
+import { CreateEmpresaDto, EmpresaDto, UpdateEmpresaDto } from './empresa.dto';
 import { EmpresaService } from './empresa.service';
 
 @Controller('empresa')
@@ -36,8 +42,12 @@ export class EmpresaController {
   @Post()
   @Validate(CreateEmpresaDto)
   @ApiOperation({ summary: 'Criar empresa' })
-  @ApiResponse({ status: 201, description: 'Empresa criada com sucesso' })
-  @ApiResponse({ status: 400, description: 'Erro ao criar empresa' })
+  @ApiCreatedResponse({
+    description: 'A empresa foi criada com sucesso.',
+    type: EmpresaDto,
+  })
+  @ApiBadRequestResponse({ description: 'Os dados enviados são inválidos.' })
+  @ApiUnauthorizedResponse({ description: 'Usuário não autenticado' })
   async create(
     @Body() createEmpresaDto: CreateEmpresaDto,
     @Req() req: Request,
@@ -46,7 +56,11 @@ export class EmpresaController {
       const token = req.headers['authorization'].split(' ')[1];
       const loggedUser = await this.authService.getLoggedUser(token);
 
-      return this.empresaService.create(createEmpresaDto, loggedUser.id);
+      const empresa = await this.empresaService.create(
+        createEmpresaDto,
+        loggedUser.id,
+      );
+      return EmpresaDto.fromEntity(empresa);
     } catch (err) {
       throw new BadRequestException(err.message);
     }
@@ -54,22 +68,29 @@ export class EmpresaController {
 
   @Get()
   @ApiOperation({ summary: 'Listar todas as empresas' })
-  @ApiResponse({ status: 200, description: 'Empresas listadas com sucesso' })
+  @ApiOkResponse({ description: 'Lista de empresas.', type: [EmpresaDto] })
+  @ApiUnauthorizedResponse({ description: 'Usuário não autenticado' })
   async findAll(@Req() req: Request) {
     const token = req.headers['authorization'].split(' ')[1];
     const loggedUser = await this.authService.getLoggedUser(token);
-    return this.empresaService.findAll(loggedUser.id);
+    const empresas = await this.empresaService.findAll(loggedUser.id);
+    return empresas.map((empresa) => EmpresaDto.fromEntity(empresa));
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Buscar empresa por ID' })
-  @ApiResponse({ status: 200, description: 'Empresa encontrada com sucesso' })
-  @ApiResponse({ status: 404, description: 'Empresa não encontrada' })
+  @ApiOkResponse({
+    description: 'A empresa foi encontrada com sucesso.',
+    type: EmpresaDto,
+  })
+  @ApiNotFoundResponse({ description: 'A empresa não foi encontrada.' })
+  @ApiUnauthorizedResponse({ description: 'Usuário não autenticado' })
   async findOne(@Param('id') id: string, @Req() req: Request) {
     const token = req.headers['authorization'].split(' ')[1];
     const loggedUser = await this.authService.getLoggedUser(token);
 
-    return this.empresaService.findOne(+id, loggedUser.id);
+    const empresa = await this.empresaService.findOne(+id, loggedUser.id);
+    return EmpresaDto.fromEntity(empresa);
   }
 
   @Patch(':id')
@@ -77,6 +98,7 @@ export class EmpresaController {
   @ApiOperation({ summary: 'Atualizar empresa por ID' })
   @ApiResponse({ status: 200, description: 'Empresa atualizada com sucesso' })
   @ApiResponse({ status: 400, description: 'Erro ao atualizar empresa' })
+  @ApiUnauthorizedResponse({ description: 'Usuário não autenticado' })
   async update(
     @Param('id') id: string,
     @Body() updateEmpresaDto: UpdateEmpresaDto,
@@ -90,8 +112,9 @@ export class EmpresaController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Remover empresa por ID' })
-  @ApiResponse({ status: 200, description: 'Empresa removida com sucesso' })
-  @ApiResponse({ status: 404, description: 'Empresa não encontrada' })
+  @ApiOkResponse({ description: 'A empresa foi removida com sucesso.' })
+  @ApiNotFoundResponse({ description: 'A empresa não foi encontrada.' })
+  @ApiUnauthorizedResponse({ description: 'Usuário não autenticado' })
   async remove(@Param('id') id: string, @Req() req: Request) {
     const token = req.headers['authorization'].split(' ')[1];
     const loggedUser = await this.authService.getLoggedUser(token);

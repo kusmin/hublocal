@@ -1,36 +1,96 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Empresa } from '@prisma/client';
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateEmpresaDto {
-  @IsString()
+  @ApiProperty({ example: 'Minha Empresa', description: 'Nome da empresa' })
   @IsNotEmpty()
-  @ApiProperty({ description: 'Nome da empresa' })
+  @IsString()
   nome: string;
 
-  @IsString()
+  @ApiProperty({
+    example: 'https://minha-empresa.com.br',
+    description: 'Website da empresa',
+  })
   @IsNotEmpty()
-  @ApiProperty({ description: 'website da empresa' })
+  @IsString()
   website: string;
 
-  @IsString()
+  @ApiProperty({
+    example: '00.000.000/0000-00',
+    description: 'CNPJ da empresa',
+  })
   @IsNotEmpty()
-  @ApiProperty({ description: 'cnpj da empresa' })
+  @IsString()
   cnpj: string;
 }
 
 export class UpdateEmpresaDto {
-  @IsString()
+  @ApiProperty({ example: 'Minha Empresa', description: 'Nome da empresa' })
   @IsOptional()
-  @ApiProperty({ description: 'Nome da empresa' })
+  @IsNotEmpty()
+  @IsString()
   nome?: string;
 
-  @IsString()
+  @ApiProperty({
+    example: 'https://minha-empresa.com.br',
+    description: 'Website da empresa',
+  })
   @IsOptional()
-  @ApiProperty({ description: 'website da empresa' })
+  @IsNotEmpty()
+  @IsString()
   website?: string;
 
-  @IsString()
+  @ApiProperty({
+    example: '00.000.000/0000-00',
+    description: 'CNPJ da empresa',
+  })
   @IsOptional()
-  @ApiProperty({ description: 'cnpj da empresa' })
+  @IsNotEmpty()
+  @IsString()
   cnpj?: string;
+}
+
+export class EmpresaDto {
+  @ApiProperty({ example: 1, description: 'ID da empresa' })
+  id: number;
+
+  @ApiProperty({ example: 'Minha Empresa', description: 'Nome da empresa' })
+  nome: string;
+
+  @ApiProperty({
+    example: 'https://minha-empresa.com.br',
+    description: 'Website da empresa',
+  })
+  website: string;
+
+  @ApiProperty({
+    example: '00.000.000/0000-00',
+    description: 'CNPJ da empresa',
+  })
+  cnpj: string;
+
+  @ApiProperty({
+    example: '2022-03-23T19:20:30Z',
+    description: 'Data de criação da empresa',
+  })
+  createdAt: Date;
+
+  @ApiProperty({
+    example: '2022-03-23T19:20:30Z',
+    description: 'Data de atualização da empresa',
+  })
+  updatedAt: Date;
+
+  static fromEntity(entity: Empresa) {
+    const { id, nome, website, cnpj, createdAt, updatedAt } = entity;
+    const dto = new EmpresaDto();
+    dto.id = id;
+    dto.nome = nome;
+    dto.website = website;
+    dto.cnpj = cnpj;
+    dto.createdAt = createdAt;
+    dto.updatedAt = updatedAt;
+    return dto;
+  }
 }

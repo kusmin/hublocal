@@ -10,6 +10,7 @@ import { PrismaService } from './prisma/prisma.service';
 import { UserController } from './user/user.controller';
 import { UserModule } from './user/user.module';
 import { UserService } from './user/user.service';
+import { LocalModule } from './local/local.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { UserService } from './user/user.service';
     PassportModule,
     AuthModule,
     EmpresaModule,
+    LocalModule,
   ],
   controllers: [AppController, UserController],
   providers: [AppService, UserService, PrismaService],
