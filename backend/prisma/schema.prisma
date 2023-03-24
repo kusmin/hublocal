@@ -11,10 +11,38 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
   senha     String
   nome      String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  empresas  Empresa[] // Relacionamento One To Many com Empresas
+}
+
+model Empresa {
+  id        Int      @id @default(autoincrement())
+  nome      String
+  website   String
+  cnpj      String   @unique
+  usuarioId Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  usuario   User     @relation(fields: [usuarioId], references: [id]) // Relacionamento Many To One com Usuários
+  locais    Local[] // Relacionamento One To Many com Locais
+}
+
+model Local {
+  id        Int      @id @default(autoincrement())
+  nome      String
+  cep       String
+  rua       String
+  numero    String
+  bairro    String
+  cidade    String
+  estado    String
+  empresaId Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  empresa   Empresa  @relation(fields: [empresaId], references: [id]) // Relacionamento Many To One com Empresas
 }
