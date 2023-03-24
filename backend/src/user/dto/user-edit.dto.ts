@@ -10,11 +10,11 @@ export class EditUserDto {
   @IsOptional()
   @IsString()
   @ApiProperty({ description: 'Nome do usuario' })
-  name?: string;
+  nome?: string;
 
   @ApiProperty({ description: 'Senha do usuario' })
   @IsOptional()
   @IsString()
   @MinLength(6)
-  password?: string;
+  senha?: string;
 }

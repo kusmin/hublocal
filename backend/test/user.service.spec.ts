@@ -42,8 +42,8 @@ describe('UserService', () => {
     it('croamdp usuario com sucesso', async () => {
       const createUserDto: CreateUserDto = {
         email: 'test@example.com',
-        name: 'Renan',
-        password: 'password123',
+        nome: 'Renan',
+        senha: 'password123',
       };
 
       const user = {
@@ -58,7 +58,7 @@ describe('UserService', () => {
       expect(result).toEqual({
         id: user.id,
         email: user.email,
-        name: user.name,
+        nome: user.nome,
       });
     });
   });
@@ -69,14 +69,14 @@ describe('UserService', () => {
         {
           id: 1,
           email: 'john@example.com',
-          name: 'John',
-          password: 'password123',
+          nome: 'John',
+          senha: 'password123',
         },
         {
           id: 2,
           email: 'jane@example.com',
-          name: 'Jane',
-          password: 'password456',
+          nome: 'Jane',
+          senha: 'password456',
         },
       ];
 
@@ -88,7 +88,7 @@ describe('UserService', () => {
         users.map((user) => ({
           id: user.id,
           email: user.email,
-          name: user.name,
+          nome: user.nome,
         })),
       );
     });
@@ -99,8 +99,8 @@ describe('UserService', () => {
       const user = {
         id: 1,
         email: 'john@example.com',
-        name: 'John',
-        password: 'password123',
+        nome: 'John',
+        senha: 'password123',
       };
 
       (prismaService.user.findUnique as jest.Mock).mockResolvedValue(user);
@@ -110,7 +110,7 @@ describe('UserService', () => {
       expect(result).toEqual({
         id: user.id,
         email: user.email,
-        name: user.name,
+        nome: user.nome,
       });
     });
   });
@@ -119,13 +119,13 @@ describe('UserService', () => {
     it('update do usuario e retorna o usuario alterado', async () => {
       const updateUserDto: EditUserDto = {
         email: 'mario@example.com',
-        name: 'Mario',
+        nome: 'Mario',
       };
 
       const user = {
         id: 1,
         ...updateUserDto,
-        password: 'password123',
+        senha: 'password123',
       };
 
       (prismaService.user.update as jest.Mock).mockResolvedValue(user);
@@ -135,7 +135,7 @@ describe('UserService', () => {
       expect(result).toEqual({
         id: user.id,
         email: user.email,
-        name: user.name,
+        nome: user.nome,
       });
     });
   });
@@ -145,7 +145,7 @@ describe('UserService', () => {
       const user = {
         id: 1,
         email: 'cesar@example.com',
-        name: 'cesar',
+        nome: 'cesar',
       };
 
       (prismaService.user.delete as jest.Mock).mockResolvedValue(user);
@@ -155,7 +155,7 @@ describe('UserService', () => {
       expect(result).toEqual({
         id: user.id,
         email: user.email,
-        name: user.name,
+        nome: user.nome,
       });
     });
   });

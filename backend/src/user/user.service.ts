@@ -12,9 +12,9 @@ export class UserService {
   constructor(private prisma: PrismaService) {}
 
   async createUser(data: CreateUserDto): Promise<UserDto> {
-    const hashedPassword = await bcrypt.hash(data.password, 10);
+    const hashedPassword = await bcrypt.hash(data.senha, 10);
     const user = await this.prisma.user.create({
-      data: { ...data, password: hashedPassword },
+      data: { ...data, senha: hashedPassword },
     });
     return toUserDto(user);
   }
@@ -29,9 +29,9 @@ export class UserService {
   }
 
   async updateUser(id: number, data: EditUserDto): Promise<UserDto> {
-    if (data.password) {
-      const hashedPassword = await bcrypt.hash(data.password, 10);
-      data.password = hashedPassword;
+    if (data.senha) {
+      const hashedPassword = await bcrypt.hash(data.senha, 10);
+      data.senha = hashedPassword;
     }
     const user = await this.prisma.user.update({ where: { id }, data });
     return toUserDto(user);
@@ -46,8 +46,8 @@ export class UserService {
     if (!user) {
       return null;
     }
-    const { password, ...rest } = user;
-    return { ...rest, password };
+    const { senha, ...rest } = user;
+    return { ...rest, senha };
   }
 
   async deleteUser(id: number): Promise<UserDto> {

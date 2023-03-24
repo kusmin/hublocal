@@ -14,12 +14,9 @@ export class AuthService {
   public async validateUser(email: string, password: string): Promise<any> {
     const user = await this.userService.findByEmail(email);
     if (user) {
-      const isPasswordValid = await this.validatePassword(
-        password,
-        user.password,
-      );
+      const isPasswordValid = await this.validatePassword(password, user.senha);
       if (isPasswordValid) {
-        const { password, ...result } = user;
+        const { senha, ...result } = user;
         return result;
       }
     }
@@ -44,7 +41,7 @@ export class AuthService {
       access_token: token,
       user: {
         id: user.id,
-        name: user.name,
+        nome: user.nome,
         email: user.email,
       },
     };

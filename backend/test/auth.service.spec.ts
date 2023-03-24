@@ -1,6 +1,9 @@
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
+import { User } from '@prisma/client';
 import { AuthService } from '../src/auth/auth.service';
+import { LoginDto } from '../src/auth/login.dto';
+import { CreateUserDto } from '../src/user/dto/user-create.dto';
 import { UserService } from '../src/user/user.service';
 
 const mockUserService = () => ({
@@ -40,7 +43,7 @@ describe('AuthService', () => {
       const testUser = {
         id: 1,
         email: 'test@example.com',
-        password: 'hashed_password',
+        senha: 'hashed_password',
       };
       userService.findByEmail = jest.fn().mockResolvedValue(testUser);
       authService.validatePassword = jest.fn().mockResolvedValue(true);
@@ -51,7 +54,7 @@ describe('AuthService', () => {
         'hashed_password',
       );
 
-      delete testUser.password;
+      delete testUser.senha;
       expect(result).toEqual(testUser);
     });
 
@@ -68,16 +71,39 @@ describe('AuthService', () => {
 
   describe('login', () => {
     it('No login retornar o token de acesso', async () => {
-      const testUser = {
+      const createUserDto: CreateUserDto = {
+        email: 'test@example.com',
+        nome: 'Renan',
+        senha: 'password123',
+      };
+
+      const createdUser: User = {
         id: 1,
         email: 'test@example.com',
-        password: 'hashed_password',
+        nome: 'Renan',
+        senha: 'hashedpassword',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
-      userService.findByEmail = jest.fn().mockResolvedValue(testUser);
+
+      userService.createUser = jest.fn().mockResolvedValue(createdUser);
+      userService.findByEmail = jest.fn().mockResolvedValue(createdUser);
+
+      const newUser = await userService.createUser(createUserDto);
+      expect(newUser).toBeDefined();
+      expect(newUser.email).toEqual(createUserDto.email);
+
+      authService.validateUser = jest.fn().mockResolvedValue(createdUser);
+
       jwtService.sign = jest.fn().mockReturnValue('test_token');
 
-      const result = await authService.login(testUser);
-      expect(result).toEqual({ access_token: 'test_token' });
+      const loginDTO: LoginDto = {
+        username: createUserDto.email,
+        password: createUserDto.senha,
+      };
+      const login = await authService.login(null, loginDTO);
+      const { access_token } = login;
+      expect(access_token).toEqual('test_token');
     });
   });
 });
