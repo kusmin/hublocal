@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  db:
+    build: ./postgresql
+    container_name: db
+    environment:
+      - POSTGRES_PASSWORD=hub
+      - POSTGRES_USER=hub
+      - POSTGRES_DB=hub  
+    ports:
+      - 5432:5432
