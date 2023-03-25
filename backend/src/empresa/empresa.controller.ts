@@ -83,7 +83,7 @@ export class EmpresaController {
   ) {
     const token = req.headers['authorization'].split(' ')[1];
     const loggedUser = await this.authService.getLoggedUser(token);
-    const empresas = await this.empresaService.findAll(
+    const { empresas, totalEmpresas } = await this.empresaService.findAll(
       loggedUser.id,
       parseInt(pagina),
       parseInt(limite),
@@ -91,12 +91,10 @@ export class EmpresaController {
 
     const empresasDTO = empresas.map((empresa) => {
       const locaisDto = empresa.locais.map(LocalDto.fromEntity);
-      console.log('locais');
-      console.log(locaisDto);
       return EmpresaDto.fromEntity(empresa, locaisDto);
     });
 
-    return empresasDTO;
+    return { empresas: empresasDTO, totalEmpresas };
   }
 
   @Get(':id')

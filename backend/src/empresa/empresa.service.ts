@@ -26,7 +26,7 @@ export class EmpresaService {
 
   async findAll(userId: number, pagina: number, limite: number) {
     const skip = pagina * limite;
-    return await this.prisma.empresa.findMany({
+    const empresas = await this.prisma.empresa.findMany({
       where: { usuarioId: userId },
       skip,
       take: limite,
@@ -34,6 +34,10 @@ export class EmpresaService {
         locais: true,
       },
     });
+    const totalEmpresas = await this.prisma.empresa.count({
+      where: { usuarioId: userId },
+    });
+    return { empresas, totalEmpresas };
   }
 
   async findOne(id: number, userId: number) {

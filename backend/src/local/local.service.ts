@@ -35,9 +35,18 @@ export class LocalService {
     return this.prisma.local.delete({ where: { id } });
   }
 
-  async findAll(empresaId?: string) {
-    const filter = empresaId ? { empresaId: Number(empresaId) } : {};
-    return this.prisma.local.findMany({ where: filter });
+  async findAll(empresaId?: string, pagina?: number, limite?: number) {
+    const where = empresaId ? { empresaId: parseInt(empresaId, 10) } : {};
+
+    const locais = await this.prisma.local.findMany({
+      where,
+      skip: pagina && limite ? pagina * limite : undefined,
+      take: limite,
+    });
+
+    const total = await this.prisma.local.count({ where });
+
+    return { locais, total };
   }
 
   async countByEmpresa(empresaId: number): Promise<number> {

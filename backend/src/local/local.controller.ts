@@ -68,8 +68,19 @@ export class LocalController {
   @ApiOkResponse({ type: LocalDto, isArray: true })
   @ApiOperation({ summary: 'Lista todos os locais' })
   @Get()
-  async findAll(@Query('empresaId') empresaId?: string): Promise<LocalDto[]> {
-    const locais = await this.localService.findAll(empresaId);
-    return locais.map(LocalDto.fromEntity);
+  async findAll(
+    @Query('empresaId') empresaId?: string,
+    @Query('pagina') pagina = '0',
+    @Query('limite') limite = '10',
+  ): Promise<{ locais: LocalDto[]; total: number }> {
+    const { locais, total } = await this.localService.findAll(
+      empresaId,
+      parseInt(pagina),
+      parseInt(limite),
+    );
+    return {
+      locais: locais.map(LocalDto.fromEntity),
+      total,
+    };
   }
 }
