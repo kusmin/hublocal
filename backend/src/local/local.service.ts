@@ -26,7 +26,7 @@ export class LocalService {
       where: { id },
       data: {
         ...data,
-        empresa: { connect: { id: Number(empresaId) } },
+        empresaId: empresaId ? Number(empresaId) : undefined,
       },
     });
   }
