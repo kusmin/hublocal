@@ -24,15 +24,26 @@ export class EmpresaService {
     });
   }
 
-  async findAll(userId: number) {
+  async findAll(userId: number, pagina: number, limite: number) {
+    const skip = pagina * limite;
     return await this.prisma.empresa.findMany({
       where: { usuarioId: userId },
+      skip,
+      take: limite,
+      include: {
+        locais: true,
+      },
     });
   }
 
   async findOne(id: number, userId: number) {
     await this.validateUser(userId, id);
-    return await this.prisma.empresa.findUnique({ where: { id } });
+    return await this.prisma.empresa.findUnique({
+      where: { id },
+      include: {
+        locais: true,
+      },
+    });
   }
 
   async update(id: number, updateEmpresaDto: UpdateEmpresaDto, userId: number) {

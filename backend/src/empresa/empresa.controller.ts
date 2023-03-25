@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -17,10 +18,13 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiQuery,
   ApiResponse,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+
+import { LocalDto } from 'src/local/local.dto';
 
 import { Validate } from 'class-validator';
 import { Request } from 'express';
@@ -70,11 +74,29 @@ export class EmpresaController {
   @ApiOperation({ summary: 'Listar todas as empresas' })
   @ApiOkResponse({ description: 'Lista de empresas.', type: [EmpresaDto] })
   @ApiUnauthorizedResponse({ description: 'Usuário não autenticado' })
-  async findAll(@Req() req: Request) {
+  @ApiQuery({ name: 'pagina', required: false, type: Number })
+  @ApiQuery({ name: 'limite', required: false, type: Number })
+  async findAll(
+    @Req() req: Request,
+    @Query('pagina') pagina = '0',
+    @Query('limite') limite = '10',
+  ) {
     const token = req.headers['authorization'].split(' ')[1];
     const loggedUser = await this.authService.getLoggedUser(token);
-    const empresas = await this.empresaService.findAll(loggedUser.id);
-    return empresas.map((empresa) => EmpresaDto.fromEntity(empresa));
+    const empresas = await this.empresaService.findAll(
+      loggedUser.id,
+      parseInt(pagina),
+      parseInt(limite),
+    );
+
+    const empresasDTO = empresas.map((empresa) => {
+      const locaisDto = empresa.locais.map(LocalDto.fromEntity);
+      console.log('locais');
+      console.log(locaisDto);
+      return EmpresaDto.fromEntity(empresa, locaisDto);
+    });
+
+    return empresasDTO;
   }
 
   @Get(':id')

@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Empresa } from '@prisma/client';
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { LocalDto } from 'src/local/local.dto';
 
 export class CreateEmpresaDto {
   @ApiProperty({ example: 'Minha Empresa', description: 'Nome da empresa' })
@@ -82,7 +83,19 @@ export class EmpresaDto {
   })
   updatedAt: Date;
 
-  static fromEntity(entity: Empresa) {
+  @ApiProperty({
+    type: [LocalDto],
+    description: 'Lista de locais da empresa',
+  })
+  locais: LocalDto[];
+
+  @ApiProperty({
+    example: 0,
+    description: 'Número total de locais da empresa',
+  })
+  qtTotalLocais: number;
+
+  static fromEntity(entity: Empresa, locais: LocalDto[] = []) {
     const { id, nome, website, cnpj, createdAt, updatedAt } = entity;
     const dto = new EmpresaDto();
     dto.id = id;
@@ -91,6 +104,9 @@ export class EmpresaDto {
     dto.cnpj = cnpj;
     dto.createdAt = createdAt;
     dto.updatedAt = updatedAt;
+    dto.locais = locais;
+    dto.qtTotalLocais = locais.length;
+
     return dto;
   }
 }

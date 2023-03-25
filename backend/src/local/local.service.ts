@@ -39,4 +39,13 @@ export class LocalService {
     const filter = empresaId ? { empresaId: Number(empresaId) } : {};
     return this.prisma.local.findMany({ where: filter });
   }
+
+  async countByEmpresa(empresaId: number): Promise<number> {
+    const count = await this.prisma.local.count({
+      where: {
+        empresaId: empresaId,
+      },
+    });
+    return count;
+  }
 }
