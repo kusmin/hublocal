@@ -7,13 +7,14 @@ services:
     depends_on:
       - db
     environment:
-      - DATABASE_URL=postgresql://hub:hub@db:5432/hublocal?schema=public
+      - DATABASE_URL=postgresql://hub:hub@db:5432/hub?schema=public
     ports:
       - '5000:5000'
     volumes:
       - .:/app
+      - ./dist:/app/build
       - /app/node_modules
-    command: sh -c "prisma migrate deploy && npm run start:dev"
+    command: sh -c "npx prisma migrate deploy && npx prisma generate && npm run start:dev"
 
   db:
     image: postgres:latest
@@ -22,7 +23,7 @@ services:
     environment:
       - POSTGRES_USER=hub
       - POSTGRES_PASSWORD=hub
-      - POSTGRES_DB=hublocal
+      - POSTGRES_DB=hub
     ports:
       - '5432:5432'
     volumes:
