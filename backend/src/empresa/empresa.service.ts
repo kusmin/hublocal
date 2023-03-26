@@ -12,9 +12,9 @@ export class EmpresaService {
   constructor(private prisma: PrismaService) {}
 
   async create(createEmpresaDto: CreateEmpresaDto, userId: number) {
-    const empresaWithSameCnpj = await this.prisma.empresa.findUnique({
-      where: { cnpj: createEmpresaDto.cnpj },
-    });
+    const empresaWithSameCnpj = await this.findCompanyByCnpj(
+      createEmpresaDto.cnpj,
+    );
 
     if (empresaWithSameCnpj) {
       throw new BadRequestException('CNPJ já registrado por outra empresa');
@@ -26,17 +26,19 @@ export class EmpresaService {
 
   async findAll(userId: number, pagina: number, limite: number) {
     const skip = pagina * limite;
-    const empresas = await this.prisma.empresa.findMany({
-      where: { usuarioId: userId },
-      skip,
-      take: limite,
-      include: {
-        locais: true,
-      },
-    });
-    const totalEmpresas = await this.prisma.empresa.count({
-      where: { usuarioId: userId },
-    });
+    const [empresas, totalEmpresas] = await Promise.all([
+      this.prisma.empresa.findMany({
+        where: { usuarioId: userId },
+        skip,
+        take: limite,
+        include: {
+          locais: true,
+        },
+      }),
+      this.prisma.empresa.count({
+        where: { usuarioId: userId },
+      }),
+    ]);
     return { empresas, totalEmpresas };
   }
 
@@ -62,9 +64,9 @@ export class EmpresaService {
     }
 
     if (updateEmpresaDto.cnpj && updateEmpresaDto.cnpj !== empresa.cnpj) {
-      const empresaWithSameCnpj = await this.prisma.empresa.findUnique({
-        where: { cnpj: updateEmpresaDto.cnpj },
-      });
+      const empresaWithSameCnpj = await this.findCompanyByCnpj(
+        updateEmpresaDto.cnpj,
+      );
 
       if (empresaWithSameCnpj) {
         throw new BadRequestException('CNPJ já registrado por outra empresa');
@@ -94,5 +96,11 @@ export class EmpresaService {
     if (empresa.usuarioId !== userId) {
       throw new UnauthorizedException('Usuário não autorizado');
     }
+  }
+
+  private async findCompanyByCnpj(cnpj: string) {
+    return await this.prisma.empresa.findUnique({
+      where: { cnpj },
+    });
   }
 }
