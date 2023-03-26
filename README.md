@@ -61,6 +61,10 @@ A API estará disponível na porta 5000. Você pode acessá-la em http://localho
 
 A api se encontra publicada no endereço https://hubapi.updevblog.com/
 
+O frontend se encontrado publicado no endereço https://hub.updevblog.com/
+
+A um portainer com no endereço https://hubport.updevblog.com/
+
 Na pasta docs se encontra o passa-a-passo das tarefas realizadas
 
 
