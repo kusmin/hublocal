@@ -18,7 +18,7 @@ export class UserService {
     if (existingUser) {
       throw new BadRequestException('Email já cadastrado.');
     }
-    const hashedPassword = await bcrypt.hash(data.senha, 10);
+    const hashedPassword = await this.hashPassword(data.senha);
     const user = await this.prisma.user.create({
       data: { ...data, senha: hashedPassword },
     });
@@ -36,8 +36,7 @@ export class UserService {
 
   async updateUser(id: number, data: EditUserDto): Promise<UserDto> {
     if (data.senha) {
-      const hashedPassword = await bcrypt.hash(data.senha, 10);
-      data.senha = hashedPassword;
+      data.senha = await this.hashPassword(data.senha);
     }
     const user = await this.prisma.user.update({ where: { id }, data });
     return toUserDto(user);
@@ -58,5 +57,9 @@ export class UserService {
 
   async deleteUser(id: number): Promise<UserDto> {
     return toUserDto(await this.prisma.user.delete({ where: { id } }));
+  }
+
+  private async hashPassword(password: string): Promise<string> {
+    return bcrypt.hash(password, 10);
   }
 }
