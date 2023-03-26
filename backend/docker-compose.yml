@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: nestjs-app
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgresql://hub:hub@db:5432/hublocal?schema=public
+    ports:
+      - '5000:5000'
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: sh -c "prisma migrate deploy && npm run start:dev"
+
+  db:
+    image: postgres:latest
+    container_name: nestjs-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=hub
+      - POSTGRES_PASSWORD=hub
+      - POSTGRES_DB=hublocal
+    ports:
+      - '5432:5432'
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+volumes:
+  db-data:
