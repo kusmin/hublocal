@@ -55,7 +55,13 @@ npx prisma migrate dev --name init
 npm run start
 ```
 
-A API estará disponível na porta 5000. Você pode acessá-la em http://localhost:5000 no seu navegador ou utilizando uma ferramenta como o Postman ou Insomnia para testar a API.
+A API estará disponível na porta 5000. Você pode acessá-la em http://localhost:5000 no seu navegador ou utilizando uma ferramenta como o Postman ou Insomnia para testar a API. A um arquivo na pasta docs com exemplo de aruivo Insomnia pronto para uso
+
+8. Publicação 
+
+A api se encontra publicada no endereço https://hubapi.updevblog.com/
+
+Na pasta docs se encontra o passa-a-passo das tarefas realizadas
 
 
 ## Sobre o projeto
