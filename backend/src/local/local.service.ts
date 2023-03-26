@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateLocalDto, UpdateLocalDto } from './local.dto';
 
@@ -11,7 +11,7 @@ export class LocalService {
     return this.prisma.local.create({
       data: {
         ...data,
-        empresa: { connect: { id: Number(empresaId) } },
+        empresa: { connect: { id: this.parseNumber(empresaId) } },
       },
     });
   }
@@ -26,7 +26,7 @@ export class LocalService {
       where: { id },
       data: {
         ...data,
-        empresaId: empresaId ? Number(empresaId) : undefined,
+        empresaId: empresaId ? this.parseNumber(empresaId) : undefined,
       },
     });
   }
@@ -36,15 +36,16 @@ export class LocalService {
   }
 
   async findAll(empresaId?: string, pagina?: number, limite?: number) {
-    const where = empresaId ? { empresaId: parseInt(empresaId, 10) } : {};
+    const where = empresaId ? { empresaId: this.parseNumber(empresaId) } : {};
 
-    const locais = await this.prisma.local.findMany({
-      where,
-      skip: pagina && limite ? pagina * limite : undefined,
-      take: limite,
-    });
-
-    const total = await this.prisma.local.count({ where });
+    const [locais, total] = await Promise.all([
+      this.prisma.local.findMany({
+        where,
+        skip: pagina && limite ? pagina * limite : undefined,
+        take: limite,
+      }),
+      this.prisma.local.count({ where }),
+    ]);
 
     return { locais, total };
   }
@@ -56,5 +57,13 @@ export class LocalService {
       },
     });
     return count;
+  }
+
+  private parseNumber(value: string): number {
+    const parsed = parseInt(value, 10);
+    if (isNaN(parsed)) {
+      throw new BadRequestException(`Invalid number: ${value}`);
+    }
+    return parsed;
   }
 }
