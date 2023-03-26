@@ -37,6 +37,9 @@ describe('EmpresaService', () => {
   };
 
   const userId = 1;
+  const pagina = 1;
+  const limite = 10;
+
   // Teste para o método create
   it('should create a new empresa', async () => {
     const userId = 1;
@@ -85,12 +88,15 @@ describe('EmpresaService', () => {
         },
       ]);
 
-    const empresas = await empresaService.findAll(userId);
+    const empresas = await empresaService.findAll(userId, pagina, limite);
 
     expect(findManySpy).toHaveBeenCalledWith({
       where: { usuarioId: userId },
+      skip: 10,
+      take: limite,
+      include: { locais: true },
     });
-    expect(empresas.length).toBe(2);
+    expect(empresas.empresas.length).toBe(2);
   });
 
   // Teste para o método findOne
@@ -109,7 +115,10 @@ describe('EmpresaService', () => {
     const empresa = await empresaService.findOne(id, userId);
 
     expect(validateUserSpy).toHaveBeenCalledWith(userId, id);
-    expect(findUniqueSpy).toHaveBeenCalledWith({ where: { id } });
+    expect(findUniqueSpy).toHaveBeenCalledWith({
+      where: { id },
+      include: { locais: true },
+    });
     expect(empresa).toEqual({
       id,
       nome: 'Teste Empresa',
